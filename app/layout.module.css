@@ -1,0 +1,23 @@
+.header {
+  text-align: center;
+  padding-block: 1rem;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.titleLink {
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+  text-decoration: none;
+  transition: text-decoration 0.2s ease-in-out;
+}
+
+.titleLink:hover {
+  text-decoration: underline;
+}
+
+.main {
+  max-width: 76rem;
+  min-height: 100vh;
+  margin: 0 auto;
+}

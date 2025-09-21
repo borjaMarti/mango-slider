@@ -4,3 +4,7 @@ https://www.radix-ui.com/primitives/docs/components/slider
 https://react-spectrum.adobe.com/react-aria/Slider.html
 https://www.w3.org/WAI/ARIA/apg/patterns/slider/
 https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/
+
+playwright
+react testing library
+vitest

@@ -3,15 +3,19 @@ import styles from "./page.module.css";
 
 export default async function Home() {
   return (
-    <main>
-      <ul>
+    <nav className={styles.nav}>
+      <ul className={styles.navList}>
         <li>
-          <Link href={"example1"}>Example 1</Link>
+          <Link href={"exercise1"} className={styles.buttonLink}>
+            Exercise 1
+          </Link>
         </li>
         <li>
-          <Link href={"example2"}>Example 2</Link>
+          <Link href={"exercise2"} className={styles.buttonLink}>
+            Exercise 2
+          </Link>
         </li>
       </ul>
-    </main>
+    </nav>
   );
 }
