@@ -1,9 +1,9 @@
 import {
   ApiResponse,
-  SliderLimits,
-  SliderLimitsSchema,
-  SliderRange,
-  SliderRangeSchema,
+  LimitedRange,
+  RangeLimitsSchema,
+  FixedRange,
+  RangeArraySchema,
 } from "../../types";
 
 const API_URL = process.env.API_URL;
@@ -13,7 +13,7 @@ const ApiEndpoints = {
   range: "/range",
 } as const;
 
-export async function getLimits(): Promise<ApiResponse<SliderLimits>> {
+export async function getLimits(): Promise<ApiResponse<LimitedRange>> {
   try {
     const res = await fetch(`${API_URL}${ApiEndpoints.limits}`);
 
@@ -22,7 +22,7 @@ export async function getLimits(): Promise<ApiResponse<SliderLimits>> {
     }
 
     const data = await res.json();
-    const sliderLimitsValidation = SliderLimitsSchema.safeParse(data);
+    const sliderLimitsValidation = RangeLimitsSchema.safeParse(data);
 
     if (!sliderLimitsValidation.success) {
       return { ok: false, error: sliderLimitsValidation.error.message };
@@ -37,7 +37,7 @@ export async function getLimits(): Promise<ApiResponse<SliderLimits>> {
   }
 }
 
-export async function getRange(): Promise<ApiResponse<SliderRange>> {
+export async function getRange(): Promise<ApiResponse<FixedRange>> {
   try {
     const res = await fetch(`${API_URL}${ApiEndpoints.range}`);
 
@@ -46,7 +46,7 @@ export async function getRange(): Promise<ApiResponse<SliderRange>> {
     }
 
     const data = await res.json();
-    const sliderRangeValidation = SliderRangeSchema.safeParse(data);
+    const sliderRangeValidation = RangeArraySchema.safeParse(data);
 
     if (!sliderRangeValidation.success) {
       return { ok: false, error: sliderRangeValidation.error.message };

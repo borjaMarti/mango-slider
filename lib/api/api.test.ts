@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { SliderLimitsSchema, SliderRangeSchema } from "../../types";
+import { RangeLimitsSchema, RangeArraySchema } from "../../types";
 import type { getLimits as GetLimitsType, getRange as GetRangeType } from ".";
 
 // Declare variables to hold the dynamically imported functions
@@ -54,7 +54,7 @@ describe("API Service", () => {
         json: () => Promise.resolve(invalidData),
       });
 
-      const validationResult = SliderLimitsSchema.safeParse(invalidData);
+      const validationResult = RangeLimitsSchema.safeParse(invalidData);
       let errorMessage = "";
       if (!validationResult.success) {
         errorMessage = validationResult.error.message;
@@ -113,7 +113,7 @@ describe("API Service", () => {
         json: () => Promise.resolve(invalidData),
       });
 
-      const validationResult = SliderRangeSchema.safeParse(invalidData);
+      const validationResult = RangeArraySchema.safeParse(invalidData);
       let errorMessage = "";
       if (!validationResult.success) {
         errorMessage = validationResult.error.message;

@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import { SliderInputProps } from "@/types";
-import styles from "./slider-input.module.css";
+import { RangeInputProps } from "@/types";
+import styles from "./range-input.module.css";
 
-export default function SliderInput({
+export default function RangeInput({
   isDisabled,
   value,
   min,
@@ -13,7 +13,7 @@ export default function SliderInput({
   onKeyDown,
   describedById,
   currencyText,
-}: SliderInputProps) {
+}: RangeInputProps) {
   return (
     <div className={styles.inputWrapper}>
       <input

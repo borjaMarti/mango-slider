@@ -8,3 +8,4 @@ https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/
 playwright
 react testing library
 vitest
+https://mango-slider.vercel.app/

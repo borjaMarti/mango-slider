@@ -1,30 +1,30 @@
 import { z } from "zod";
 
-export const SliderLimitsSchema = z.object({
+export const RangeLimitsSchema = z.object({
   min: z.number(),
   max: z.number(),
 });
 
-export const SliderRangeSchema = z.object({
+export const RangeArraySchema = z.object({
   range: z.tuple([z.number(), z.number()]).rest(z.number()),
 });
 
-export type SliderLimits = z.infer<typeof SliderLimitsSchema>;
-export type SliderRange = z.infer<typeof SliderRangeSchema>;
+export type LimitedRange = z.infer<typeof RangeLimitsSchema>;
+export type FixedRange = z.infer<typeof RangeArraySchema>;
 
-interface RangeSliderProps {
+interface LimitedRangeProps {
   fixedValues?: false;
   min: number;
   max: number;
 }
 
-interface FixedSliderProps {
+interface FixedRangeProps {
   fixedValues: [number, number, ...number[]];
 }
 
-export type SliderProps = RangeSliderProps | FixedSliderProps;
+export type RangeProps = LimitedRangeProps | FixedRangeProps;
 
-export interface SliderInputProps {
+export interface RangeInputProps {
   currencyText: string;
   describedById: string;
   isDisabled: boolean;
@@ -36,7 +36,7 @@ export interface SliderInputProps {
   value: string;
 }
 
-export interface SliderThumbProps {
+export interface RangeThumbProps {
   isActive: boolean;
   isOverlapping: boolean;
   min: number;

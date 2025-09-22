@@ -1,11 +1,11 @@
 "use client";
 import { useSlider } from "@/hooks/use-slider";
-import { SliderProps } from "@/types";
-import styles from "./slider.module.css";
-import SliderInput from "./slider-input";
-import SliderThumb from "./slider-thumb";
+import { RangeProps } from "@/types";
+import styles from "./range.module.css";
+import RangeInput from "./range-input";
+import RangeThumb from "./range-thumb";
 
-export default function Slider(props: SliderProps) {
+export default function Range(props: RangeProps) {
   const {
     trackRef,
     startThumbRef,
@@ -32,7 +32,7 @@ export default function Slider(props: SliderProps) {
   return (
     <div className={`${styles.root} ${activeThumb ? styles.grabbing : ""}`}>
       <div className={styles.inputsContainer}>
-        <SliderInput
+        <RangeInput
           isDisabled={!!props.fixedValues}
           value={startInput}
           min={min}
@@ -44,7 +44,7 @@ export default function Slider(props: SliderProps) {
           currencyText="Euros"
         />
 
-        <SliderInput
+        <RangeInput
           isDisabled={!!props.fixedValues}
           value={endInput}
           min={min}
@@ -66,7 +66,7 @@ export default function Slider(props: SliderProps) {
           }}
         />
 
-        <SliderThumb
+        <RangeThumb
           thumbRef={startThumbRef}
           position={startThumbPosition}
           value={startInput}
@@ -86,7 +86,7 @@ export default function Slider(props: SliderProps) {
           }}
         />
 
-        <SliderThumb
+        <RangeThumb
           thumbRef={endThumbRef}
           position={endThumbPosition}
           value={endInput}

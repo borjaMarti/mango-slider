@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import { SliderThumbProps } from "@/types";
-import styles from "./slider-thumb.module.css";
+import { RangeThumbProps } from "@/types";
+import styles from "./range-thumb.module.css";
 
-export default function SliderThumb({
+export default function RangeThumb({
   thumbRef,
   position,
   value,
@@ -15,7 +15,7 @@ export default function SliderThumb({
   onKeyDown,
   onMouseDown,
   onTouchStart,
-}: SliderThumbProps) {
+}: RangeThumbProps) {
   const overlappingClass = isOverlapping
     ? thumbType === "start"
       ? styles.startThumbOverlapping

@@ -1,7 +1,7 @@
 import { Keymap } from "../keymap";
-import styles from "./slider-showcase.module.css";
+import styles from "./range-showcase.module.css";
 
-export default function SliderShowcase({
+export default function RangeShowcase({
   children,
 }: Readonly<{
   children: React.ReactNode;
