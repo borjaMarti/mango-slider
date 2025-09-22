@@ -29,8 +29,8 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <header className={styles.header}>
           <h1>
-            <Link href="/" className={styles.titleLink}>
-              🥭 MANGO Slider
+            <Link href="/">
+              🥭 <span className={styles.titleLink}>MANGO Slider</span>
             </Link>
           </h1>
         </header>
