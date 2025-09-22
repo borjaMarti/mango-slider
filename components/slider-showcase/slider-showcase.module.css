@@ -1,0 +1,10 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding-top: calc(33.33vh - 70px);
+}
+
+.sliderWrapper {
+  width: 100%;
+  max-width: 28.625rem;
+}

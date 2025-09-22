@@ -32,6 +32,6 @@
 
 .buttonLink:hover,
 .buttonLink:focus {
-  background-color: black;
+  background-color: var(--black);
   color: white;
 }

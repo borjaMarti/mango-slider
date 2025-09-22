@@ -33,117 +33,105 @@ export function useSlider(props: SliderProps) {
     [endValue, min, max],
   );
 
-  const getNextValue = useCallback(
-    (currentValue: number) => {
-      if (fixedValues) {
-        const currentIndex = fixedValues.indexOf(currentValue);
-        if (currentIndex < fixedValues.length - 1) {
-          return fixedValues[currentIndex + 1];
-        }
-        return currentValue;
+  const getNextValue = (currentValue: number) => {
+    if (fixedValues) {
+      const currentIndex = fixedValues.indexOf(currentValue);
+      if (currentIndex < fixedValues.length - 1) {
+        return fixedValues[currentIndex + 1];
       }
-      return currentValue + 1;
-    },
-    [fixedValues],
-  );
+      return currentValue;
+    }
+    return currentValue + 1;
+  };
 
-  const getPrevValue = useCallback(
-    (currentValue: number) => {
-      if (fixedValues) {
-        const currentIndex = fixedValues.indexOf(currentValue);
-        if (currentIndex > 0) {
-          return fixedValues[currentIndex - 1];
-        }
-        return currentValue;
+  const getPrevValue = (currentValue: number) => {
+    if (fixedValues) {
+      const currentIndex = fixedValues.indexOf(currentValue);
+      if (currentIndex > 0) {
+        return fixedValues[currentIndex - 1];
       }
-      return currentValue - 1;
-    },
-    [fixedValues],
-  );
+      return currentValue;
+    }
+    return currentValue - 1;
+  };
 
-  const handleStartKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLSpanElement>) => {
-      switch (e.key) {
-        case "ArrowRight":
-        case "ArrowUp": {
-          e.preventDefault();
-          const nextVal = getNextValue(startValue);
-          const maxStart = calculateMaxStart(endValue);
-          const calculatedNextVal = Math.min(nextVal, maxStart);
-          setStartValue(calculatedNextVal);
-          setStartInput(String(calculatedNextVal));
-          break;
-        }
-        case "ArrowLeft":
-        case "ArrowDown": {
-          e.preventDefault();
-          const prevVal = getPrevValue(startValue);
-          const calculatedPrevVal = Math.max(prevVal, min);
-          setStartValue(calculatedPrevVal);
-          setStartInput(String(calculatedPrevVal));
-          break;
-        }
-        case "Home": {
-          e.preventDefault();
-          setStartValue(min);
-          setStartInput(String(min));
-          break;
-        }
-        case "End": {
-          e.preventDefault();
-          const maxStart = calculateMaxStart(endValue);
-          setStartValue(maxStart);
-          setStartInput(String(maxStart));
-          break;
-        }
-        default:
-          break;
+  const handleStartKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    switch (e.key) {
+      case "ArrowRight":
+      case "ArrowUp": {
+        e.preventDefault();
+        const nextVal = getNextValue(startValue);
+        const maxStart = calculateMaxStart(endValue);
+        const calculatedNextVal = Math.min(nextVal, maxStart);
+        setStartValue(calculatedNextVal);
+        setStartInput(String(calculatedNextVal));
+        break;
       }
-    },
-    [startValue, endValue, min, getNextValue, getPrevValue, calculateMaxStart],
-  );
+      case "ArrowLeft":
+      case "ArrowDown": {
+        e.preventDefault();
+        const prevVal = getPrevValue(startValue);
+        const calculatedPrevVal = Math.max(prevVal, min);
+        setStartValue(calculatedPrevVal);
+        setStartInput(String(calculatedPrevVal));
+        break;
+      }
+      case "Home": {
+        e.preventDefault();
+        setStartValue(min);
+        setStartInput(String(min));
+        break;
+      }
+      case "End": {
+        e.preventDefault();
+        const maxStart = calculateMaxStart(endValue);
+        setStartValue(maxStart);
+        setStartInput(String(maxStart));
+        break;
+      }
+      default:
+        break;
+    }
+  };
 
-  const handleEndKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLSpanElement>) => {
-      switch (e.key) {
-        case "ArrowRight":
-        case "ArrowUp": {
-          e.preventDefault();
-          const nextVal = getNextValue(endValue);
-          const calculatedNextVal = Math.min(nextVal, max);
-          setEndValue(calculatedNextVal);
-          setEndInput(String(calculatedNextVal));
-          break;
-        }
-        case "ArrowLeft":
-        case "ArrowDown": {
-          e.preventDefault();
-          const prevVal = getPrevValue(endValue);
-          const minEnd = calculateMinEnd(startValue);
-          const calculatedPrevVal = Math.max(prevVal, minEnd);
-          setEndValue(calculatedPrevVal);
-          setEndInput(String(calculatedPrevVal));
-          break;
-        }
-        case "Home": {
-          e.preventDefault();
-          const minEnd = calculateMinEnd(startValue);
-          setEndValue(minEnd);
-          setEndInput(String(minEnd));
-          break;
-        }
-        case "End": {
-          e.preventDefault();
-          setEndValue(max);
-          setEndInput(String(max));
-          break;
-        }
-        default:
-          break;
+  const handleEndKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    switch (e.key) {
+      case "ArrowRight":
+      case "ArrowUp": {
+        e.preventDefault();
+        const nextVal = getNextValue(endValue);
+        const calculatedNextVal = Math.min(nextVal, max);
+        setEndValue(calculatedNextVal);
+        setEndInput(String(calculatedNextVal));
+        break;
       }
-    },
-    [endValue, startValue, max, getNextValue, getPrevValue, calculateMinEnd],
-  );
+      case "ArrowLeft":
+      case "ArrowDown": {
+        e.preventDefault();
+        const prevVal = getPrevValue(endValue);
+        const minEnd = calculateMinEnd(startValue);
+        const calculatedPrevVal = Math.max(prevVal, minEnd);
+        setEndValue(calculatedPrevVal);
+        setEndInput(String(calculatedPrevVal));
+        break;
+      }
+      case "Home": {
+        e.preventDefault();
+        const minEnd = calculateMinEnd(startValue);
+        setEndValue(minEnd);
+        setEndInput(String(minEnd));
+        break;
+      }
+      case "End": {
+        e.preventDefault();
+        setEndValue(max);
+        setEndInput(String(max));
+        break;
+      }
+      default:
+        break;
+    }
+  };
 
   function calculateMaxStart(currentEndValue: number) {
     if (fixedValues) {
@@ -203,28 +191,14 @@ export function useSlider(props: SliderProps) {
     setActiveThumb(null);
   };
 
-  useEffect(() => {
-    if (activeThumb) {
-      window.addEventListener("mousemove", handleDrag);
-      window.addEventListener("mouseup", handleDragEnd);
-      window.addEventListener("touchmove", handleDrag);
-      window.addEventListener("touchend", handleDragEnd);
-    }
-
-    return () => {
-      window.removeEventListener("mousemove", handleDrag);
-      window.removeEventListener("mouseup", handleDragEnd);
-      window.removeEventListener("touchmove", handleDrag);
-      window.removeEventListener("touchend", handleDragEnd);
-    };
-  }, [activeThumb]);
-
   const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setStartInput(e.target.value.replace(/[^0-9]/g, ""));
+    const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
+    setStartInput(sanitizedValue.slice(0, 3));
   };
 
   const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEndInput(e.target.value.replace(/[^0-9]/g, ""));
+    const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
+    setEndInput(sanitizedValue.slice(0, 3));
   };
 
   const handleStartBlur = () => {
@@ -264,6 +238,22 @@ export function useSlider(props: SliderProps) {
       e.currentTarget.blur();
     }
   };
+
+  useEffect(() => {
+    if (activeThumb) {
+      window.addEventListener("mousemove", handleDrag);
+      window.addEventListener("mouseup", handleDragEnd);
+      window.addEventListener("touchmove", handleDrag);
+      window.addEventListener("touchend", handleDragEnd);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleDrag);
+      window.removeEventListener("mouseup", handleDragEnd);
+      window.removeEventListener("touchmove", handleDrag);
+      window.removeEventListener("touchend", handleDragEnd);
+    };
+  }, [activeThumb]);
 
   return {
     trackRef,

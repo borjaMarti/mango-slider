@@ -31,23 +31,51 @@ export default function Slider(props: SliderProps) {
         cursor: activeThumb ? "grabbing" : "",
       }}
     >
-      <div className={styles.inputWrapper}>
-        <input
-          disabled={!!props.fixedValues}
-          className={styles.input}
-          type="text"
-          inputMode="numeric"
-          value={startInput}
-          onChange={handleStartChange}
-          onBlur={handleStartBlur}
-          onKeyDown={handleStartInputKeyDown}
-          aria-describedby="start-value-currency"
-        />
-        <span id="start-value-currency" className="visually-hidden">
-          Euros
-        </span>
+      {/* Text Inputs */}
+      <div className={styles.inputsContainer}>
+        <div className={styles.inputWrapper}>
+          <input
+            disabled={!!props.fixedValues}
+            className={styles.input}
+            type="text"
+            inputMode="numeric"
+            value={startInput}
+            onChange={handleStartChange}
+            onBlur={handleStartBlur}
+            onKeyDown={handleStartInputKeyDown}
+            aria-describedby="start-value-currency"
+          />
+          <span id="start-value-currency" className="visually-hidden">
+            Euros
+          </span>
+        </div>
+        <div className={styles.inputWrapper}>
+          <input
+            disabled={!!props.fixedValues}
+            className={styles.input}
+            type="text"
+            inputMode="numeric"
+            value={endInput}
+            onChange={handleEndChange}
+            onBlur={handleEndBlur}
+            onKeyDown={handleEndInputKeyDown}
+            aria-describedby="end-value-currency"
+          />
+          <span id="end-value-currency" className="visually-hidden">
+            Euros
+          </span>
+        </div>
       </div>
+
+      {/* Track and Thumbs */}
       <span ref={trackRef} className={styles.track}>
+        <span
+          className={styles.activeTrack}
+          style={{
+            left: `${startThumbPosition}%`,
+            width: `${endThumbPosition - startThumbPosition}%`,
+          }}
+        />
         <span
           ref={startThumbRef}
           className={`${styles.thumb} ${
@@ -68,8 +96,12 @@ export default function Slider(props: SliderProps) {
           aria-valuetext={`${startInput}€`}
           tabIndex={0}
           onKeyDown={handleStartKeyDown}
-          onMouseDown={() => setActiveThumb("start")}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setActiveThumb("start");
+          }}
           onTouchStart={(e) => {
+            e.preventDefault();
             setActiveThumb("start");
           }}
         />
@@ -93,30 +125,16 @@ export default function Slider(props: SliderProps) {
           aria-valuetext={`${endInput}€`}
           tabIndex={0}
           onKeyDown={handleEndKeyDown}
-          onMouseDown={() => {
+          onMouseDown={(e) => {
+            e.preventDefault();
             setActiveThumb("end");
           }}
           onTouchStart={(e) => {
+            e.preventDefault();
             setActiveThumb("end");
           }}
         />
       </span>
-      <div className={styles.inputWrapper}>
-        <input
-          disabled={!!props.fixedValues}
-          className={styles.input}
-          type="text"
-          inputMode="numeric"
-          value={endInput}
-          onChange={handleEndChange}
-          onBlur={handleEndBlur}
-          onKeyDown={handleEndInputKeyDown}
-          aria-describedby="end-value-currency"
-        />
-        <span id="end-value-currency" className="visually-hidden">
-          Euros
-        </span>
-      </div>
     </div>
   );
 }

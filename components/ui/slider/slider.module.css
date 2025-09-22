@@ -1,10 +1,20 @@
 .root {
+  --thumb-width: 1.125rem;
   position: relative;
   display: flex;
-  gap: 1rem;
-  align-items: center;
-  height: 1.25rem;
+  flex-direction: column;
+  gap: 0.5rem;
   max-width: 28.625rem;
+  box-sizing: border-box;
+  padding-left: calc(var(--thumb-width) / 2);
+  padding-right: calc(var(--thumb-width) / 2);
+}
+
+.inputsContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-left: calc(var(--thumb-width) / -2);
+  margin-right: calc(var(--thumb-width) / -2);
 }
 
 .input {
@@ -13,7 +23,9 @@
   outline: none;
   width: 100%;
   padding-right: 1.125rem;
+  color: inherit;
   text-align: end;
+  font-size: inherit;
   font-family: sans-serif;
 }
 
@@ -23,7 +35,7 @@
 
 .inputWrapper {
   position: relative;
-  width: 55px;
+  width: 4rem;
 }
 
 .inputWrapper::after {
@@ -37,20 +49,28 @@
 }
 
 .track {
-  background-color: black;
+  background-color: var(--gray);
   position: relative;
-  flex-grow: 1;
+  width: 100%;
   border-radius: 1px;
-  height: 0.125rem;
+  height: 1px;
+  margin-top: 0.5rem;
+}
+
+.activeTrack {
+  position: absolute;
+  height: 1px;
+  background-color: var(--black);
+  border-radius: 1px;
 }
 
 .thumb {
   position: absolute;
-  top: -0.5rem;
+  top: calc(var(--thumb-width) / 2 * -1);
   display: block;
-  width: 1.125rem;
-  height: 1.125rem;
-  background-color: black;
+  width: var(--thumb-width);
+  height: var(--thumb-width);
+  background-color: var(--black);
   border-radius: 100%;
   transition:
     transform 50ms ease-out,
@@ -68,4 +88,16 @@
 
 .thumb:focus {
   outline: none;
+}
+
+@media (min-width: 1024px) {
+  .root {
+    --thumb-width: 0.625rem;
+  }
+
+  .thumb:hover,
+  .thumb:focus,
+  .thumb.grabbing {
+    transform: translate(-50%) scale(1.4);
+  }
 }

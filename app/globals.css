@@ -1,5 +1,11 @@
+:root {
+  --black: #121212;
+  --gray: #dadada;
+}
+
 body {
   font-family: sans-serif;
+  color: var(--black);
 }
 
 * {
