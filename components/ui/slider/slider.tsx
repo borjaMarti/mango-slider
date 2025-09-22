@@ -2,72 +2,61 @@
 import { useSlider } from "@/hooks/use-slider";
 import { SliderProps } from "@/types";
 import styles from "./slider.module.css";
+import SliderInput from "./slider-input";
+import SliderThumb from "./slider-thumb";
 
 export default function Slider(props: SliderProps) {
   const {
     trackRef,
     startThumbRef,
     endThumbRef,
+    min,
+    max,
     startInput,
     endInput,
     startThumbPosition,
     endThumbPosition,
+    activeThumb,
+    setActiveThumb,
     handleStartChange,
     handleEndChange,
     handleStartBlur,
     handleEndBlur,
-    activeThumb,
-    setActiveThumb,
     handleStartKeyDown,
     handleEndKeyDown,
     handleStartInputKeyDown,
     handleEndInputKeyDown,
+    areThumbsOverlapping,
   } = useSlider(props);
 
   return (
-    <div
-      className={styles.root}
-      style={{
-        cursor: activeThumb ? "grabbing" : "",
-      }}
-    >
-      {/* Text Inputs */}
+    <div className={`${styles.root} ${activeThumb ? styles.grabbing : ""}`}>
       <div className={styles.inputsContainer}>
-        <div className={styles.inputWrapper}>
-          <input
-            disabled={!!props.fixedValues}
-            className={styles.input}
-            type="text"
-            inputMode="numeric"
-            value={startInput}
-            onChange={handleStartChange}
-            onBlur={handleStartBlur}
-            onKeyDown={handleStartInputKeyDown}
-            aria-describedby="start-value-currency"
-          />
-          <span id="start-value-currency" className="visually-hidden">
-            Euros
-          </span>
-        </div>
-        <div className={styles.inputWrapper}>
-          <input
-            disabled={!!props.fixedValues}
-            className={styles.input}
-            type="text"
-            inputMode="numeric"
-            value={endInput}
-            onChange={handleEndChange}
-            onBlur={handleEndBlur}
-            onKeyDown={handleEndInputKeyDown}
-            aria-describedby="end-value-currency"
-          />
-          <span id="end-value-currency" className="visually-hidden">
-            Euros
-          </span>
-        </div>
+        <SliderInput
+          isDisabled={!!props.fixedValues}
+          value={startInput}
+          min={min}
+          max={max}
+          onChange={handleStartChange}
+          onBlur={handleStartBlur}
+          onKeyDown={handleStartInputKeyDown}
+          describedById="start-value-currency"
+          currencyText="Euros"
+        />
+
+        <SliderInput
+          isDisabled={!!props.fixedValues}
+          value={endInput}
+          min={min}
+          max={max}
+          onChange={handleEndChange}
+          onBlur={handleEndBlur}
+          onKeyDown={handleEndInputKeyDown}
+          describedById="end-value-currency"
+          currencyText="Euros"
+        />
       </div>
 
-      {/* Track and Thumbs */}
       <span ref={trackRef} className={styles.track}>
         <span
           className={styles.activeTrack}
@@ -76,25 +65,16 @@ export default function Slider(props: SliderProps) {
             width: `${endThumbPosition - startThumbPosition}%`,
           }}
         />
-        <span
-          ref={startThumbRef}
-          className={`${styles.thumb} ${
-            activeThumb === "start" ? styles.grabbing : ""
-          }`}
-          style={{
-            left: `${startThumbPosition}%`,
-            cursor: activeThumb === "start" ? "grabbing" : "",
-          }}
-          role="slider"
-          aria-valuenow={Number(startInput)}
-          aria-valuemin={props.fixedValues ? props.fixedValues[0] : props.min}
-          aria-valuemax={
-            props.fixedValues
-              ? props.fixedValues[props.fixedValues.length - 1]
-              : props.max
-          }
-          aria-valuetext={`${startInput}€`}
-          tabIndex={0}
+
+        <SliderThumb
+          thumbRef={startThumbRef}
+          position={startThumbPosition}
+          value={startInput}
+          min={min}
+          max={max}
+          isActive={activeThumb === "start"}
+          isOverlapping={areThumbsOverlapping}
+          thumbType="start"
           onKeyDown={handleStartKeyDown}
           onMouseDown={(e) => {
             e.preventDefault();
@@ -105,25 +85,16 @@ export default function Slider(props: SliderProps) {
             setActiveThumb("start");
           }}
         />
-        <span
-          ref={endThumbRef}
-          className={`${styles.thumb} ${
-            activeThumb === "end" ? styles.grabbing : ""
-          }`}
-          style={{
-            left: `${endThumbPosition}%`,
-            cursor: activeThumb === "end" ? "grabbing" : "",
-          }}
-          role="slider"
-          aria-valuenow={Number(endInput)}
-          aria-valuemin={props.fixedValues ? props.fixedValues[0] : props.min}
-          aria-valuemax={
-            props.fixedValues
-              ? props.fixedValues[props.fixedValues.length - 1]
-              : props.max
-          }
-          aria-valuetext={`${endInput}€`}
-          tabIndex={0}
+
+        <SliderThumb
+          thumbRef={endThumbRef}
+          position={endThumbPosition}
+          value={endInput}
+          min={min}
+          max={max}
+          isActive={activeThumb === "end"}
+          isOverlapping={areThumbsOverlapping}
+          thumbType="end"
           onKeyDown={handleEndKeyDown}
           onMouseDown={(e) => {
             e.preventDefault();

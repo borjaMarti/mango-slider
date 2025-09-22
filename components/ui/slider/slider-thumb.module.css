@@ -1,0 +1,68 @@
+.thumbContainer {
+  position: absolute;
+  top: calc(var(--thumb-width) / 2 * -1);
+  height: var(--thumb-width);
+  width: var(--thumb-width);
+  transform: translateX(-50%);
+  transition: transform 100ms ease-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: var(--black);
+  border-radius: 100%;
+  transition: transform 100ms ease-out;
+  cursor: grab;
+  touch-action: none;
+}
+
+.grabbing {
+  cursor: grabbing;
+}
+
+.thumb:focus {
+  outline: none;
+}
+
+.thumb:hover,
+.thumb:focus,
+.grabbing {
+  transform: scale(1.2);
+}
+
+.startThumbOverlapping {
+  transform: translate(-50%, calc(-1 * var(--thumb-offset)));
+}
+
+.endThumbOverlapping {
+  transform: translate(-50%, var(--thumb-offset));
+}
+
+.overlappingThumbLine {
+  position: absolute;
+  width: 1px;
+  background-color: var(--black);
+}
+
+.startThumbOverlapping .overlappingThumbLine {
+  top: 100%;
+  height: calc(var(--thumb-offset) - (var(--thumb-width) / 2) + 0.5px);
+}
+
+.endThumbOverlapping .overlappingThumbLine {
+  bottom: 100%;
+  height: calc(var(--thumb-offset) - (var(--thumb-width) / 2));
+}
+
+@media (min-width: 1024px) {
+  .thumb:hover,
+  .thumb:focus,
+  .grabbing {
+    transform: scale(1.5);
+  }
+}

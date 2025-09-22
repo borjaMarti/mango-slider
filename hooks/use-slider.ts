@@ -1,11 +1,16 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { SliderProps } from "@/types";
+import {
+  clamp,
+  calculateThumbPosition,
+  getClosestValue,
+  getStepValue,
+} from "@/lib/utils";
 
 export function useSlider(props: SliderProps) {
   const trackRef = useRef<HTMLSpanElement>(null);
   const startThumbRef = useRef<HTMLSpanElement>(null);
   const endThumbRef = useRef<HTMLSpanElement>(null);
-  const [activeThumb, setActiveThumb] = useState<"start" | "end" | null>(null);
 
   const { min, max, fixedValues } = useMemo(() => {
     if (props.fixedValues) {
@@ -20,208 +25,162 @@ export function useSlider(props: SliderProps) {
 
   const [startValue, setStartValue] = useState(min);
   const [endValue, setEndValue] = useState(max);
-
   const [startInput, setStartInput] = useState(String(startValue));
   const [endInput, setEndInput] = useState(String(endValue));
+  const [activeThumb, setActiveThumb] = useState<"start" | "end" | null>(null);
+  const [areThumbsOverlapping, setAreThumbsOverlapping] = useState(false);
 
   const startThumbPosition = useMemo(
-    () => ((startValue - min) / (max - min)) * 100,
+    () => calculateThumbPosition(startValue, min, max),
     [startValue, min, max],
   );
   const endThumbPosition = useMemo(
-    () => ((endValue - min) / (max - min)) * 100,
+    () => calculateThumbPosition(endValue, min, max),
     [endValue, min, max],
   );
 
-  const getNextValue = (currentValue: number) => {
-    if (fixedValues) {
-      const currentIndex = fixedValues.indexOf(currentValue);
-      if (currentIndex < fixedValues.length - 1) {
-        return fixedValues[currentIndex + 1];
-      }
-      return currentValue;
-    }
-    return currentValue + 1;
-  };
+  const calculateMaxStart = useCallback(
+    (currentEndValue: number) =>
+      getStepValue(currentEndValue, "decrease", fixedValues),
+    [fixedValues],
+  );
 
-  const getPrevValue = (currentValue: number) => {
-    if (fixedValues) {
-      const currentIndex = fixedValues.indexOf(currentValue);
-      if (currentIndex > 0) {
-        return fixedValues[currentIndex - 1];
-      }
-      return currentValue;
-    }
-    return currentValue - 1;
-  };
+  const calculateMinEnd = useCallback(
+    (currentStartValue: number) =>
+      getStepValue(currentStartValue, "increase", fixedValues),
+    [fixedValues],
+  );
 
-  const handleStartKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
-    switch (e.key) {
-      case "ArrowRight":
-      case "ArrowUp": {
-        e.preventDefault();
-        const nextVal = getNextValue(startValue);
-        const maxStart = calculateMaxStart(endValue);
-        const calculatedNextVal = Math.min(nextVal, maxStart);
-        setStartValue(calculatedNextVal);
-        setStartInput(String(calculatedNextVal));
-        break;
-      }
-      case "ArrowLeft":
-      case "ArrowDown": {
-        e.preventDefault();
-        const prevVal = getPrevValue(startValue);
-        const calculatedPrevVal = Math.max(prevVal, min);
-        setStartValue(calculatedPrevVal);
-        setStartInput(String(calculatedPrevVal));
-        break;
-      }
-      case "Home": {
-        e.preventDefault();
-        setStartValue(min);
-        setStartInput(String(min));
-        break;
-      }
-      case "End": {
-        e.preventDefault();
-        const maxStart = calculateMaxStart(endValue);
-        setStartValue(maxStart);
-        setStartInput(String(maxStart));
-        break;
-      }
-      default:
-        break;
-    }
-  };
+  const handleDrag = useCallback(
+    (e: PointerEvent) => {
+      if (!activeThumb || !trackRef.current) return;
 
-  const handleEndKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
-    switch (e.key) {
-      case "ArrowRight":
-      case "ArrowUp": {
-        e.preventDefault();
-        const nextVal = getNextValue(endValue);
-        const calculatedNextVal = Math.min(nextVal, max);
-        setEndValue(calculatedNextVal);
-        setEndInput(String(calculatedNextVal));
-        break;
-      }
-      case "ArrowLeft":
-      case "ArrowDown": {
-        e.preventDefault();
-        const prevVal = getPrevValue(endValue);
-        const minEnd = calculateMinEnd(startValue);
-        const calculatedPrevVal = Math.max(prevVal, minEnd);
-        setEndValue(calculatedPrevVal);
-        setEndInput(String(calculatedPrevVal));
-        break;
-      }
-      case "Home": {
-        e.preventDefault();
-        const minEnd = calculateMinEnd(startValue);
-        setEndValue(minEnd);
-        setEndInput(String(minEnd));
-        break;
-      }
-      case "End": {
-        e.preventDefault();
-        setEndValue(max);
-        setEndInput(String(max));
-        break;
-      }
-      default:
-        break;
-    }
-  };
-
-  function calculateMaxStart(currentEndValue: number) {
-    if (fixedValues) {
-      const endIndex = fixedValues.indexOf(currentEndValue);
-      return endIndex > 0 ? fixedValues[endIndex - 1] : min;
-    }
-    return currentEndValue - 1;
-  }
-
-  function calculateMinEnd(currentStartValue: number) {
-    if (fixedValues) {
-      const startIndex = fixedValues.indexOf(currentStartValue);
-      return startIndex < fixedValues.length - 1
-        ? fixedValues[startIndex + 1]
-        : max;
-    }
-    return currentStartValue + 1;
-  }
-
-  const handleDrag = (e: MouseEvent | TouchEvent) => {
-    if (!activeThumb || !trackRef.current) return;
-
-    const trackRect = trackRef.current.getBoundingClientRect();
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const position = clientX - trackRect.left;
-    const percentage = Math.max(0, Math.min(1, position / trackRect.width));
-
-    let newValue = min + percentage * (max - min);
-
-    if (fixedValues) {
-      newValue = fixedValues.reduce((prev, curr) =>
-        Math.abs(curr - newValue) < Math.abs(prev - newValue) ? curr : prev,
+      const trackRect = trackRef.current.getBoundingClientRect();
+      const percentage = clamp(
+        (e.clientX - trackRect.left) / trackRect.width,
+        0,
+        1,
       );
-    } else {
-      newValue = Math.round(newValue);
-    }
+      let newValue = min + percentage * (max - min);
 
-    if (activeThumb === "start") {
-      const maxAllowedStart = calculateMaxStart(endValue);
-      const newCalculatedValue = Math.min(newValue, maxAllowedStart);
-      setStartValue(newCalculatedValue);
-      setStartInput(String(newCalculatedValue));
-    } else {
-      const minAllowedEnd = calculateMinEnd(startValue);
-      const newCalculatedValue = Math.max(newValue, minAllowedEnd);
-      setEndValue(newCalculatedValue);
-      setEndInput(String(newCalculatedValue));
-    }
-  };
+      newValue = fixedValues
+        ? getClosestValue(newValue, fixedValues)
+        : Math.round(newValue);
 
-  const handleDragEnd = () => {
-    if (activeThumb === "start" && startThumbRef.current) {
-      startThumbRef.current.blur();
-    } else if (activeThumb === "end" && endThumbRef.current) {
-      endThumbRef.current.blur();
-    }
+      if (activeThumb === "start") {
+        const maxAllowedStart = calculateMaxStart(endValue);
+        const newStartValue = clamp(newValue, min, maxAllowedStart);
+        setStartValue(newStartValue);
+        setStartInput(String(newStartValue));
+      } else {
+        const minAllowedEnd = calculateMinEnd(startValue);
+        const newEndValue = clamp(newValue, minAllowedEnd, max);
+        setEndValue(newEndValue);
+        setEndInput(String(newEndValue));
+      }
+    },
+    [
+      activeThumb,
+      min,
+      max,
+      fixedValues,
+      startValue,
+      endValue,
+      calculateMaxStart,
+      calculateMinEnd,
+    ],
+  );
+
+  const handleDragEnd = useCallback(() => {
     setActiveThumb(null);
-  };
+  }, []);
+
+  const handleStartKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLSpanElement>) => {
+      const maxStart = calculateMaxStart(endValue);
+      switch (e.key) {
+        case "ArrowRight":
+        case "ArrowUp":
+          e.preventDefault();
+          setStartValue((v) =>
+            clamp(getStepValue(v, "increase", fixedValues), min, maxStart),
+          );
+          break;
+        case "ArrowLeft":
+        case "ArrowDown":
+          e.preventDefault();
+          setStartValue((v) =>
+            clamp(getStepValue(v, "decrease", fixedValues), min, maxStart),
+          );
+          break;
+        case "Home":
+          e.preventDefault();
+          setStartValue(min);
+          break;
+        case "End":
+          e.preventDefault();
+          setStartValue(maxStart);
+          break;
+      }
+    },
+    [min, endValue, fixedValues, calculateMaxStart],
+  );
+
+  const handleEndKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLSpanElement>) => {
+      const minEnd = calculateMinEnd(startValue);
+      switch (e.key) {
+        case "ArrowRight":
+        case "ArrowUp":
+          e.preventDefault();
+          setEndValue((v) =>
+            clamp(getStepValue(v, "increase", fixedValues), minEnd, max),
+          );
+          break;
+        case "ArrowLeft":
+        case "ArrowDown":
+          e.preventDefault();
+          setEndValue((v) =>
+            clamp(getStepValue(v, "decrease", fixedValues), minEnd, max),
+          );
+          break;
+        case "Home":
+          e.preventDefault();
+          setEndValue(minEnd);
+          break;
+        case "End":
+          e.preventDefault();
+          setEndValue(max);
+          break;
+      }
+    },
+    [max, startValue, fixedValues, calculateMinEnd],
+  );
 
   const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
-    setStartInput(sanitizedValue.slice(0, 3));
+    setStartInput(e.target.value.replace(/[^0-9]/g, "").slice(0, 3));
   };
-
   const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const sanitizedValue = e.target.value.replace(/[^0-9]/g, "");
-    setEndInput(sanitizedValue.slice(0, 3));
+    setEndInput(e.target.value.replace(/[^0-9]/g, "").slice(0, 3));
   };
 
-  const handleStartBlur = () => {
-    let numericStart = Number(startInput);
-    if (startInput === "" || isNaN(numericStart)) {
-      numericStart = min;
-    }
+  const handleStartBlur = useCallback(() => {
+    const numericStart = Number(startInput);
+    const value = isNaN(numericStart) ? min : numericStart;
     const maxStart = calculateMaxStart(endValue);
-    const newValue = Math.min(Math.max(numericStart, min), maxStart);
+    const newValue = clamp(value, min, maxStart);
     setStartValue(newValue);
     setStartInput(String(newValue));
-  };
+  }, [startInput, min, endValue, calculateMaxStart]);
 
-  const handleEndBlur = () => {
-    let numericEnd = Number(endInput);
-    if (endInput === "" || isNaN(numericEnd)) {
-      numericEnd = max;
-    }
+  const handleEndBlur = useCallback(() => {
+    const numericEnd = Number(endInput);
+    const value = isNaN(numericEnd) ? max : numericEnd;
     const minEnd = calculateMinEnd(startValue);
-    const newValue = Math.min(Math.max(numericEnd, minEnd), max);
+    const newValue = clamp(value, minEnd, max);
     setEndValue(newValue);
     setEndInput(String(newValue));
-  };
+  }, [endInput, max, startValue, calculateMinEnd]);
 
   const handleStartInputKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
@@ -240,38 +199,57 @@ export function useSlider(props: SliderProps) {
   };
 
   useEffect(() => {
-    if (activeThumb) {
-      window.addEventListener("mousemove", handleDrag);
-      window.addEventListener("mouseup", handleDragEnd);
-      window.addEventListener("touchmove", handleDrag);
-      window.addEventListener("touchend", handleDragEnd);
-    }
+    setStartInput(String(startValue));
+  }, [startValue]);
 
-    return () => {
-      window.removeEventListener("mousemove", handleDrag);
-      window.removeEventListener("mouseup", handleDragEnd);
-      window.removeEventListener("touchmove", handleDrag);
-      window.removeEventListener("touchend", handleDragEnd);
-    };
-  }, [activeThumb]);
+  useEffect(() => {
+    setEndInput(String(endValue));
+  }, [endValue]);
+
+  useEffect(() => {
+    if (activeThumb) {
+      window.addEventListener("pointermove", handleDrag);
+      window.addEventListener("pointerup", handleDragEnd);
+      window.addEventListener("pointercancel", handleDragEnd);
+      return () => {
+        window.removeEventListener("pointermove", handleDrag);
+        window.removeEventListener("pointerup", handleDragEnd);
+        window.removeEventListener("pointercancel", handleDragEnd);
+      };
+    }
+  }, [activeThumb, handleDrag, handleDragEnd]);
+
+  useEffect(() => {
+    if (trackRef.current && startThumbRef.current) {
+      const trackWidth = trackRef.current.getBoundingClientRect().width;
+      const thumbWidth = startThumbRef.current.getBoundingClientRect().width;
+      const thumbWidthPercentage = (thumbWidth / trackWidth) * 100;
+      setAreThumbsOverlapping(
+        endThumbPosition - startThumbPosition < thumbWidthPercentage,
+      );
+    }
+  }, [startThumbPosition, endThumbPosition]);
 
   return {
     trackRef,
     startThumbRef,
     endThumbRef,
+    min,
+    max,
     startInput,
     endInput,
     startThumbPosition,
     endThumbPosition,
+    activeThumb,
+    setActiveThumb,
     handleStartChange,
     handleEndChange,
     handleStartBlur,
     handleEndBlur,
-    activeThumb,
-    setActiveThumb,
     handleStartKeyDown,
     handleEndKeyDown,
     handleStartInputKeyDown,
     handleEndInputKeyDown,
+    areThumbsOverlapping,
   };
 }

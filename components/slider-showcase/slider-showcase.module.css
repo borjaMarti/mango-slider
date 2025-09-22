@@ -1,7 +1,10 @@
 .container {
   display: flex;
   justify-content: center;
-  padding-top: calc(33.33vh - 70px);
+  align-items: center;
+  flex-direction: column;
+  gap: 4rem;
+  padding-top: calc(25vh - 70px);
 }
 
 .sliderWrapper {

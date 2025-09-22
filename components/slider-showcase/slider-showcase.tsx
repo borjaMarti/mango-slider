@@ -1,6 +1,7 @@
+import { Keymap } from "../keymap";
 import styles from "./slider-showcase.module.css";
 
-export default async function SliderShowcase({
+export default function SliderShowcase({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -8,6 +9,7 @@ export default async function SliderShowcase({
   return (
     <div className={styles.container}>
       <div className={styles.sliderWrapper}>{children}</div>
+      <Keymap />
     </div>
   );
 }
