@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { SliderProps } from "@/types";
+import { RangeProps } from "@/types";
 import {
   clamp,
   calculateThumbPosition,
@@ -7,7 +7,7 @@ import {
   getStepValue,
 } from "@/lib/utils";
 
-export function useSlider(props: SliderProps) {
+export function useSlider(props: RangeProps) {
   const trackRef = useRef<HTMLSpanElement>(null);
   const startThumbRef = useRef<HTMLSpanElement>(null);
   const endThumbRef = useRef<HTMLSpanElement>(null);
@@ -34,6 +34,7 @@ export function useSlider(props: SliderProps) {
     () => calculateThumbPosition(startValue, min, max),
     [startValue, min, max],
   );
+
   const endThumbPosition = useMemo(
     () => calculateThumbPosition(endValue, min, max),
     [endValue, min, max],
@@ -55,26 +56,40 @@ export function useSlider(props: SliderProps) {
     (e: PointerEvent) => {
       if (!activeThumb || !trackRef.current) return;
 
+      // Get track's positioning/dimensions info.
       const trackRect = trackRef.current.getBoundingClientRect();
+
+      // Calculate thumb position on the track as a percentage.
+      // e.clientX: thumb's x position on the viewport.
+      // trackRect.left: track's leftmost x position on the viewport.
+      // clamp() to not go below 0 or above 1 when dragging outside.
       const percentage = clamp(
         (e.clientX - trackRect.left) / trackRect.width,
         0,
         1,
       );
+
+      // Convert percentage into value.
       let newValue = min + percentage * (max - min);
 
+      // If the slider has a fixed set of values, snap to the closest one.
+      // Otherwise, round to the nearest whole number.
       newValue = fixedValues
         ? getClosestValue(newValue, fixedValues)
         : Math.round(newValue);
 
       if (activeThumb === "start") {
+        // Ensure the start thumb cannot go past the end thumb.
         const maxAllowedStart = calculateMaxStart(endValue);
         const newStartValue = clamp(newValue, min, maxAllowedStart);
+
         setStartValue(newStartValue);
         setStartInput(String(newStartValue));
       } else {
+        // Ensure the end thumb cannot go past the start thumb.
         const minAllowedEnd = calculateMinEnd(startValue);
         const newEndValue = clamp(newValue, minAllowedEnd, max);
+
         setEndValue(newEndValue);
         setEndInput(String(newEndValue));
       }
@@ -95,6 +110,7 @@ export function useSlider(props: SliderProps) {
     setActiveThumb(null);
   }, []);
 
+  // Keyboard handling logic.
   const handleStartKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLSpanElement>) => {
       const maxStart = calculateMaxStart(endValue);
@@ -157,17 +173,22 @@ export function useSlider(props: SliderProps) {
     [max, startValue, fixedValues, calculateMinEnd],
   );
 
+  // Control the form and only use a valid inputValue.
   const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStartInput(e.target.value.replace(/[^0-9]/g, "").slice(0, 3));
   };
+
   const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEndInput(e.target.value.replace(/[^0-9]/g, "").slice(0, 3));
   };
 
+  // After unfocusing input, update values:
   const handleStartBlur = useCallback(() => {
     const numericStart = Number(startInput);
     const value = isNaN(numericStart) ? min : numericStart;
+    // Calculate what's the max valid startValue just below the current endValue.
     const maxStart = calculateMaxStart(endValue);
+    // Final value should be between absolute min value and relative max (inclusive).
     const newValue = clamp(value, min, maxStart);
     setStartValue(newValue);
     setStartInput(String(newValue));
@@ -176,12 +197,15 @@ export function useSlider(props: SliderProps) {
   const handleEndBlur = useCallback(() => {
     const numericEnd = Number(endInput);
     const value = isNaN(numericEnd) ? max : numericEnd;
+    // Calculate what's the min valid endValue just above the current startValue.
     const minEnd = calculateMinEnd(startValue);
+    // Final value should be between relative min value and absolute max (inclusive).
     const newValue = clamp(value, minEnd, max);
     setEndValue(newValue);
     setEndInput(String(newValue));
   }, [endInput, max, startValue, calculateMinEnd]);
 
+  // Unfocus input and validate value on pressing Enter.
   const handleStartInputKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
@@ -198,6 +222,7 @@ export function useSlider(props: SliderProps) {
     }
   };
 
+  // Keep input value updated with start and end values.
   useEffect(() => {
     setStartInput(String(startValue));
   }, [startValue]);
@@ -219,11 +244,15 @@ export function useSlider(props: SliderProps) {
     }
   }, [activeThumb, handleDrag, handleDragEnd]);
 
+  // Calculate whether thumbs are overlapping.
   useEffect(() => {
     if (trackRef.current && startThumbRef.current) {
       const trackWidth = trackRef.current.getBoundingClientRect().width;
       const thumbWidth = startThumbRef.current.getBoundingClientRect().width;
+      // How much percentage does the thumb width occupy.
       const thumbWidthPercentage = (thumbWidth / trackWidth) * 100;
+      // If the difference in percentage between start and end thumbs is less than
+      // thumbWidthPercentage, that means they are overlapping.
       setAreThumbsOverlapping(
         endThumbPosition - startThumbPosition < thumbWidthPercentage,
       );
