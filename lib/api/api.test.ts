@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { RangeLimitsSchema, RangeArraySchema } from "../../types";
+import { RangeLimitsSchema, RangeArraySchema } from "@/types";
 import type { getLimits as GetLimitsType, getRange as GetRangeType } from ".";
 
 // Declare variables to hold the dynamically imported functions
