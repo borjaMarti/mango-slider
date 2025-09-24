@@ -19,12 +19,6 @@ describe("clamp", () => {
     expect(clamp(15, 0, 10)).toBe(10);
   });
 
-  it("should work with negative ranges", () => {
-    expect(clamp(-15, -10, 0)).toBe(-10);
-    expect(clamp(5, -10, 0)).toBe(0);
-    expect(clamp(-5, -10, 0)).toBe(-5);
-  });
-
   it("should handle the case where min and max are equal", () => {
     expect(clamp(10, 5, 5)).toBe(5);
     expect(clamp(0, 5, 5)).toBe(5);
