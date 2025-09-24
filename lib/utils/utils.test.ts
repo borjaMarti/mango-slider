@@ -79,7 +79,6 @@ describe("getClosestValue", () => {
   });
 
   it("should return the smaller value if the target is exactly between two values", () => {
-    // The reduce implementation will favor the `prev` value in a tie.
     expect(getClosestValue(12.5, fixedValues)).toBe(0);
     expect(getClosestValue(37.5, fixedValues)).toBe(25);
   });
@@ -105,14 +104,6 @@ describe("getStepValue", () => {
     it("should decrease the value by the default step (1)", () => {
       expect(getStepValue(10, "decrease")).toBe(9);
     });
-
-    it("should increase the value by a custom step", () => {
-      expect(getStepValue(10, "increase", undefined, 5)).toBe(15);
-    });
-
-    it("should decrease the value by a custom step", () => {
-      expect(getStepValue(10, "decrease", undefined, 5)).toBe(5);
-    });
   });
 
   describe("with fixed values", () => {
@@ -132,11 +123,6 @@ describe("getStepValue", () => {
 
     it("should return the same value if decreasing from the first value", () => {
       expect(getStepValue(0, "decrease", fixedValues)).toBe(0);
-    });
-
-    it("should ignore the step parameter when fixedValues is provided", () => {
-      expect(getStepValue(20, "increase", fixedValues, 100)).toBe(30);
-      expect(getStepValue(20, "decrease", fixedValues, 100)).toBe(10);
     });
 
     it("should return the min value if it is not found in the array", () => {

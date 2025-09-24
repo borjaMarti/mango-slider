@@ -1,6 +1,6 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import Range from "./range";
 
 // In the JSDOM environment components don't have size or position, so we mock
@@ -9,8 +9,8 @@ const mockBoundingClientRect = vi.fn();
 
 describe("Range Component", () => {
   beforeEach(() => {
-    // This makes the math easy: a clientX of 500 is exactly 50% of the way.
-    // Track 1000px wide with x=0 for ease of calculation (clientX 500 = 50% of the track).
+    // 1000px wide with x=0 to make the calculations easier:
+    // clientX 500px = 50% of the way.
     mockBoundingClientRect.mockReturnValue({
       width: 1000,
       height: 2,
@@ -21,10 +21,6 @@ describe("Range Component", () => {
     });
     // Substitute with mock method in the Element prototype.
     Element.prototype.getBoundingClientRect = mockBoundingClientRect;
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   describe("Dragging Functionality", () => {
@@ -108,34 +104,34 @@ describe("Range Component", () => {
 
     it("should snap to the closest fixed value when dragged", async () => {
       const user = userEvent.setup();
-      const fixedValues: [number, number, ...number[]] = [0, 25, 50, 75, 100];
+      const fixedValues: [number, number, ...number[]] = [
+        1.99, 5.99, 10.99, 30.99, 50.99, 70.99,
+      ];
       render(<Range fixedValues={fixedValues} />);
 
       const [startThumb] = screen.getAllByRole("slider");
 
-      // Closest value to 310 is 25.
       await user.pointer([
         { keys: "[MouseLeft>]", target: startThumb },
-        { coords: { clientX: 310 } },
+        { coords: { clientX: 300 } },
         { keys: "[/MouseLeft]" },
       ]);
 
-      expect(startThumb).toHaveAttribute("aria-valuenow", "25");
+      expect(startThumb).toHaveAttribute("aria-valuenow", "30.99");
 
-      // Closest value to 410 is 50.
       await user.pointer([
         { keys: "[MouseLeft>]", target: startThumb },
-        { coords: { clientX: 410 } },
+        { coords: { clientX: 700 } },
         { keys: "[/MouseLeft]" },
       ]);
 
-      expect(startThumb).toHaveAttribute("aria-valuenow", "50");
+      expect(startThumb).toHaveAttribute("aria-valuenow", "50.99");
     });
   });
 
   // --- Keyboard Functionality Tests ---
   describe("Keyboard Functionality", () => {
-    describe("Continuous Slider", () => {
+    describe("Limits", () => {
       it("should increment/decrement thumb values with arrow keys", async () => {
         const user = userEvent.setup();
         render(<Range min={1} max={100} />);
@@ -217,7 +213,7 @@ describe("Range Component", () => {
       });
     });
 
-    describe("Fixed Values (Stepped) Slider", () => {
+    describe("Fixed Values", () => {
       const fixedValues: [number, number, ...number[]] = [
         1.99, 5.99, 10.99, 30.99, 50.99, 70.99,
       ];

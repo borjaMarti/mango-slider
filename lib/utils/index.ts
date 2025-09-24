@@ -24,7 +24,6 @@ export const getStepValue = (
   currentValue: number,
   direction: "increase" | "decrease",
   fixedValues?: number[],
-  step: number = 1,
 ): number => {
   if (fixedValues) {
     const currentIndex = fixedValues.indexOf(currentValue);
@@ -39,5 +38,5 @@ export const getStepValue = (
     }
     return currentValue;
   }
-  return direction === "increase" ? currentValue + step : currentValue - step;
+  return direction === "increase" ? currentValue + 1 : currentValue - 1;
 };
