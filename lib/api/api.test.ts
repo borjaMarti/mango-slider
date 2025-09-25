@@ -97,7 +97,7 @@ describe("API Service", () => {
 
       // Mock Zod error message.
       const validationResult = RangeArraySchema.safeParse(invalidData);
-      let errorMessage = validationResult.error?.message;
+      const errorMessage = validationResult.error?.message;
 
       expect(result).toEqual({ ok: false, error: errorMessage });
     });
