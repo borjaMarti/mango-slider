@@ -30,7 +30,7 @@ Next.js implements [ESLint](https://eslint.org/) by default, and strict TypeScri
 
 The data returned from the API is parsed and validated using [Zod](https://zod.dev/) to ensure correct data structures at runtime.
 
-Finally, [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) are used to run tests for the component functionality and the API and utility functions.
+Finally, [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) are used to run tests for the component functionality and the API and utility functions, while [Mock Service Workers](https://mswjs.io/) handles the API mocking.
 
 ### Accessibility
 
