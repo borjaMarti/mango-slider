@@ -22,8 +22,6 @@ export default function RangeInput({
         type="text"
         inputMode="numeric"
         value={value}
-        aria-valuemin={min}
-        aria-valuemax={max}
         onChange={onChange}
         onBlur={onBlur}
         onKeyDown={onKeyDown}
