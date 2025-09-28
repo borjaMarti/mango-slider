@@ -13,8 +13,7 @@ export default function RangeThumb({
   isOverlapping,
   thumbType,
   onKeyDown,
-  onMouseDown,
-  onTouchStart,
+  onPointerDown,
 }: RangeThumbProps) {
   const overlappingClass = isOverlapping
     ? thumbType === "start"
@@ -38,8 +37,7 @@ export default function RangeThumb({
         aria-valuetext={`${value}€`}
         tabIndex={0}
         onKeyDown={onKeyDown}
-        onMouseDown={onMouseDown}
-        onTouchStart={onTouchStart}
+        onPointerDown={onPointerDown}
       />
     </div>
   );

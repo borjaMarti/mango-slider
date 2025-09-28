@@ -4,7 +4,7 @@ import {
   RangeLimitsSchema,
   FixedRange,
   RangeArraySchema,
-} from "../../types";
+} from "@/types";
 
 const API_URL = process.env.API_URL;
 

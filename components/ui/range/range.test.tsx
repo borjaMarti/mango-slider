@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Range from "./range";
+import { Range } from ".";
 
 // In the JSDOM environment components don't have size or position, so we mock
 // the getBoundingClientRect with a mock DOMRect object.

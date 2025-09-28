@@ -76,11 +76,7 @@ export default function Range(props: RangeProps) {
           isOverlapping={areThumbsOverlapping}
           thumbType="start"
           onKeyDown={handleStartKeyDown}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setActiveThumb("start");
-          }}
-          onTouchStart={(e) => {
+          onPointerDown={(e) => {
             e.preventDefault();
             setActiveThumb("start");
           }}
@@ -96,11 +92,7 @@ export default function Range(props: RangeProps) {
           isOverlapping={areThumbsOverlapping}
           thumbType="end"
           onKeyDown={handleEndKeyDown}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setActiveThumb("end");
-          }}
-          onTouchStart={(e) => {
+          onPointerDown={(e) => {
             e.preventDefault();
             setActiveThumb("end");
           }}

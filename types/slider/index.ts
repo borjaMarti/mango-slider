@@ -42,8 +42,7 @@ export interface RangeThumbProps {
   min: number;
   max: number;
   onKeyDown: (e: React.KeyboardEvent<HTMLSpanElement>) => void;
-  onMouseDown: (e: React.MouseEvent<HTMLSpanElement>) => void;
-  onTouchStart: (e: React.TouchEvent<HTMLSpanElement>) => void;
+  onPointerDown: (e: React.PointerEvent<HTMLSpanElement>) => void;
   position: number;
   thumbRef: React.RefObject<HTMLSpanElement | null>;
   thumbType: "start" | "end";
